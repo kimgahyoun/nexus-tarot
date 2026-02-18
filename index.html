@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXUS TAROT - 상담 결과</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         /* 폰트 및 기본 설정 */
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -15,8 +16,10 @@
             margin: 0;
             overflow-x: hidden;
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* 버튼 배치를 위해 column 추가 */
+            align-items: center;
             min-height: 100vh;
+            padding-bottom: 50px;
         }
 
         /* ✨ 별빛 배경 효과 */
@@ -42,14 +45,14 @@
 
         /* 컨테이너 및 애니메이션 */
         .card-container { 
-            background: rgba(26, 26, 26, 0.85); 
+            background: rgba(26, 26, 26, 0.9); /* 캡처 시 가독성을 위해 불투명도 조절 */
             backdrop-filter: blur(10px);
             border: 1px solid rgba(212, 175, 55, 0.3); 
             border-radius: 20px; 
             padding: 30px; 
             max-width: 400px; 
             width: 90%; 
-            margin: 40px 0;
+            margin: 40px 0 20px 0;
             box-shadow: 0 0 40px rgba(0,0,0,0.8); 
             text-align: center; 
             opacity: 0;
@@ -82,13 +85,33 @@
         }
 
         .highlight { color: #d4af37; font-weight: bold; font-size: 1.1rem; }
+        
+        /* ✨ 저장 버튼 스타일 */
+        .save-btn {
+            background: linear-gradient(135deg, #d4af37, #b8860b);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            z-index: 10;
+        }
+
+        .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4); }
+        .save-btn:active { transform: scale(0.95); }
+
         footer { margin-top: 40px; font-size: 0.75rem; color: #777; letter-spacing: 1px; }
     </style>
 </head>
 <body>
     <div id="stars"></div>
 
-    <div class="card-container">
+    <div id="capture-area" class="card-container">
         <h1>🔮 NEXUS TAROT</h1>
         <div class="date" id="current-date">DATE</div>
         
@@ -105,6 +128,10 @@
 
         <footer>© 2026 AI+X NEXUS PROJECT</footer>
     </div>
+
+    <button class="save-btn" onclick="saveResult()">
+        📥 결과 이미지 저장하기
+    </button>
 
     <script>
         // ✨ 배경 별 생성 스크립트
@@ -123,27 +150,48 @@
 
         // 🔮 데이터 로드 스크립트
         const urlParams = new URLSearchParams(window.location.search);
-        
-        // 1. 사용자 이름 및 주제 설정
         if(urlParams.has('name')) document.getElementById('user-name').innerText = urlParams.get('name');
         if(urlParams.has('topic')) document.getElementById('topic').innerText = urlParams.get('topic');
-        
-        // 2. 상담 내용 설정 (줄바꿈 처리)
         if(urlParams.has('text')) {
             const cleanText = decodeURIComponent(urlParams.get('text')).replace(/\\n/g, '<br>');
             document.getElementById('ai-response').innerHTML = cleanText;
         }
         
-        // 3. URL에서 카드 ID를 읽어와 이미지 경로 변경 (예: ?card=0)
+        // ✨ 이미지 파일 양식 반영 (Card_0.jpg 형식)
         if(urlParams.has('card')) {
             const cardId = urlParams.get('card'); 
             document.getElementById('card-image').src = `./images/tarot_cards/Card_${cardId}.jpg`;
         }
 
-        // 현재 날짜 표시
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('ko-KR', {
             year: 'numeric', month: 'long', day: 'numeric'
         });
+
+        // ✨ 이미지 저장 함수
+        function saveResult() {
+            const btn = document.querySelector('.save-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ 저장 중...";
+            
+            const area = document.getElementById('capture-area');
+            
+            html2canvas(area, {
+                backgroundColor: "#050508", // 저장될 이미지 배경색
+                scale: 2, // 고화질 설정
+                useCORS: true, // 이미지 서버 허용
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Nexus_Tarot_Result.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                btn.innerText = originalText;
+            }).catch(err => {
+                console.error("저장 실패:", err);
+                btn.innerText = "❌ 저장 실패";
+                setTimeout(() => btn.innerText = originalText, 2000);
+            });
+        }
     </script>
 </body>
 </html>
