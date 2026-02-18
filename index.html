@@ -134,7 +134,7 @@
     </button>
 
     <script>
-        // ✨ 배경 별 생성 스크립트
+        // 1. 배경 별 생성
         const starsContainer = document.getElementById('stars');
         for (let i = 0; i < 150; i++) {
             const star = document.createElement('div');
@@ -148,7 +148,7 @@
             starsContainer.appendChild(star);
         }
 
-        // 🔮 데이터 로드 스크립트
+        // 2. 데이터 로드 로직
         const urlParams = new URLSearchParams(window.location.search);
         if(urlParams.has('name')) document.getElementById('user-name').innerText = urlParams.get('name');
         if(urlParams.has('topic')) document.getElementById('topic').innerText = urlParams.get('topic');
@@ -156,8 +156,6 @@
             const cleanText = decodeURIComponent(urlParams.get('text')).replace(/\\n/g, '<br>');
             document.getElementById('ai-response').innerHTML = cleanText;
         }
-        
-        // ✨ 이미지 파일 양식 반영 (Card_0.jpg 형식)
         if(urlParams.has('card')) {
             const cardId = urlParams.get('card'); 
             document.getElementById('card-image').src = `./images/tarot_cards/Card_${cardId}.jpg`;
@@ -167,47 +165,47 @@
             year: 'numeric', month: 'long', day: 'numeric'
         });
 
-        // ✨ 이미지 저장 함수
+        // 3. 이미지 저장 함수 (구조 정밀 보정)
         function saveResult() {
-    const btn = document.querySelector('.save-btn');
-    const originalText = btn.innerText;
-    btn.innerText = "⏳ 저장 중...";
-    
-    const area = document.getElementById('capture-area');
-    
-    html2canvas(area, {
-        // 1. 배경색을 약간 밝은 회색(#1a1a1a)으로 설정하여 가독성 확보
-        backgroundColor: "#1a1a1a", 
-        scale: 2, 
-        useCORS: true, 
-        logging: false,
-        // 2. 캡처할 때만 스타일을 강제로 보정하는 옵션 추가
-        onclone: (clonedDoc) => {
-            const clonedArea = clonedDoc.getElementById('capture-area');
-            // 캡처본에서는 투명도를 없애고 배경을 확실하게 칠함
-            clonedArea.style.opacity = "1";
-            clonedArea.style.background = "#1a1a1a"; 
-            clonedArea.style.transform = "none";
+            const btn = document.querySelector('.save-btn');
+            const originalText = btn.innerText;
+            const area = document.getElementById('capture-area');
             
-            // 텍스트 색상이 너무 흐릿하다면 강제로 밝게 만듦
-            const resultBox = clonedArea.querySelector('.result-box');
-            if (resultBox) {
-                resultBox.style.background = "#252525";
-                resultBox.style.color = "#e0e0e0";
-            }
+            btn.innerText = "⏳ 저장 중...";
+            
+            html2canvas(area, {
+                backgroundColor: "#1a1a1a",
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                onclone: (clonedDoc) => {
+                    const clonedArea = clonedDoc.getElementById('capture-area');
+                    clonedArea.style.opacity = "1";
+                    clonedArea.style.transform = "none";
+                    const resultBox = clonedArea.querySelector('.result-box');
+                    if (resultBox) {
+                        resultBox.style.background = "#252525";
+                        resultBox.style.color = "#e0e0e0";
+                    }
+                }
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = imgData;
+                link.download = `Nexus_Tarot_Result.png`;
+                
+                // DOM에 붙였다가 클릭 후 제거 (가장 안전한 방식)
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                setTimeout(() => { btn.innerText = originalText; }, 1000);
+            }).catch(err => {
+                console.error("저장 실패:", err);
+                btn.innerText = "❌ 재시도";
+                setTimeout(() => { btn.innerText = originalText; }, 2000);
+            });
         }
-    }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `Nexus_Tarot_Result.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        btn.innerText = originalText;
-    }).catch(err => {
-        console.error("저장 실패:", err);
-        btn.innerText = "❌ 저장 실패";
-        setTimeout(() => btn.innerText = originalText, 2000);
-    });
-}
     </script>
 </body>
 </html>
