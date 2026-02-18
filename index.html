@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEXUS TAROT - 상담 결과</title>
+    <style>
+      body {
+        background-color: #0d0d0d;
+        color: #e0e0e0;
+        font-family: "Pretendard", sans-serif;
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+      }
+      .card-container {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 15px;
+        padding: 30px;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        text-align: center;
+      }
+      h1 {
+        color: #d4af37;
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+      }
+      .date {
+        font-size: 0.8rem;
+        color: #888;
+        margin-bottom: 20px;
+      }
+      .tarot-img {
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid #d4af37;
+        margin: 20px 0;
+      }
+      .result-box {
+        text-align: left;
+        background: #252525;
+        padding: 20px;
+        border-radius: 10px;
+        line-height: 1.6;
+      }
+      .highlight {
+        color: #d4af37;
+        font-weight: bold;
+      }
+      footer {
+        margin-top: 30px;
+        font-size: 0.7rem;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card-container">
+      <h1>🔮 NEXUS TAROT</h1>
+      <div class="date" id="current-date">2026.02.18</div>
+
+      <div id="user-info" style="margin-bottom: 15px">
+        <span class="highlight" id="user-name">가현</span>님의 상담 결과
+      </div>
+
+      <img
+        id="card-image"
+        src="https://via.placeholder.com/300x500?text=Tarot+Card"
+        alt="타로 카드"
+        class="tarot-img"
+      />
+
+      <div class="result-box">
+        <p><strong>주제:</strong> <span id="topic">연애운</span></p>
+        <p id="ai-response">AI 마스터가 당신의 미래를 해석하고 있습니다...</p>
+      </div>
+
+      <footer>© 2026 AI+X NEXUS Project. All rights reserved.</footer>
+    </div>
+
+    <script>
+      // URL의 파라미터를 읽어와서 화면에 표시하는 로직
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has("name"))
+        document.getElementById("user-name").innerText = urlParams.get("name");
+      if (urlParams.has("topic"))
+        document.getElementById("topic").innerText = urlParams.get("topic");
+      if (urlParams.has("text"))
+        document.getElementById("ai-response").innerText = decodeURIComponent(
+          urlParams.get("text"),
+        );
+
+      // 날짜 자동 설정
+      document.getElementById("current-date").innerText =
+        new Date().toLocaleDateString();
+    </script>
+  </body>
+</html>
