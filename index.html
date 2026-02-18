@@ -1,101 +1,146 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXUS TAROT - 상담 결과</title>
     <style>
-      body {
-        background-color: #0d0d0d;
-        color: #e0e0e0;
-        font-family: "Pretendard", sans-serif;
-        display: flex;
-        justify-content: center;
-        padding: 20px;
-      }
-      .card-container {
-        background: #1a1a1a;
-        border: 1px solid #333;
-        border-radius: 15px;
-        padding: 30px;
-        max-width: 400px;
-        width: 100%;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        text-align: center;
-      }
-      h1 {
-        color: #d4af37;
-        font-size: 1.5rem;
-        margin-bottom: 5px;
-      }
-      .date {
-        font-size: 0.8rem;
-        color: #888;
-        margin-bottom: 20px;
-      }
-      .tarot-img {
-        width: 100%;
-        border-radius: 10px;
-        border: 1px solid #d4af37;
-        margin: 20px 0;
-      }
-      .result-box {
-        text-align: left;
-        background: #252525;
-        padding: 20px;
-        border-radius: 10px;
-        line-height: 1.6;
-      }
-      .highlight {
-        color: #d4af37;
-        font-weight: bold;
-      }
-      footer {
-        margin-top: 30px;
-        font-size: 0.7rem;
-        color: #555;
-      }
+        /* 폰트 및 기본 설정 */
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        body { 
+            background-color: #050508; 
+            color: #e0e0e0; 
+            font-family: 'Pretendard', sans-serif; 
+            margin: 0;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* ✨ 별빛 배경 효과 */
+        #stars {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* 컨테이너 및 애니메이션 */
+        .card-container { 
+            background: rgba(26, 26, 26, 0.85); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.3); 
+            border-radius: 20px; 
+            padding: 30px; 
+            max-width: 400px; 
+            width: 90%; 
+            margin: 40px 0;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8); 
+            text-align: center; 
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1.2s forwards ease-out;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { color: #d4af37; font-size: 1.6rem; margin-bottom: 5px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+        .date { font-size: 0.8rem; color: #aaa; margin-bottom: 25px; font-style: italic; }
+        
+        .tarot-img { 
+            width: 100%; 
+            border-radius: 12px; 
+            border: 1px solid #d4af37; 
+            margin: 20px 0; 
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .result-box { 
+            text-align: left; 
+            background: rgba(40, 40, 40, 0.6); 
+            padding: 20px; 
+            border-radius: 12px; 
+            line-height: 1.8;
+            border-left: 3px solid #d4af37;
+        }
+
+        .highlight { color: #d4af37; font-weight: bold; font-size: 1.1rem; }
+        footer { margin-top: 40px; font-size: 0.75rem; color: #777; letter-spacing: 1px; }
     </style>
-  </head>
-  <body>
+</head>
+<body>
+    <div id="stars"></div>
+
     <div class="card-container">
-      <h1>🔮 NEXUS TAROT</h1>
-      <div class="date" id="current-date">2026.02.18</div>
+        <h1>🔮 NEXUS TAROT</h1>
+        <div class="date" id="current-date">DATE</div>
+        
+        <div id="user-info" style="margin-bottom: 20px;">
+            <span class="highlight" id="user-name">내담자</span>님의 상담 결과
+        </div>
 
-      <div id="user-info" style="margin-bottom: 15px">
-        <span class="highlight" id="user-name">가현</span>님의 상담 결과
-      </div>
+        <img id="card-image" src="https://via.placeholder.com/300x500?text=Tarot+Card" alt="타로 카드" class="tarot-img">
+        
+        <div class="result-box">
+            <p><strong>주제:</strong> <span id="topic">연애운</span></p>
+            <p id="ai-response" style="font-size: 0.95rem;">AI 마스터가 당신의 미래를 해석하고 있습니다...</p>
+        </div>
 
-      <img
-        id="card-image"
-        src="https://via.placeholder.com/300x500?text=Tarot+Card"
-        alt="타로 카드"
-        class="tarot-img"
-      />
-
-      <div class="result-box">
-        <p><strong>주제:</strong> <span id="topic">연애운</span></p>
-        <p id="ai-response">AI 마스터가 당신의 미래를 해석하고 있습니다...</p>
-      </div>
-
-      <footer>© 2026 AI+X NEXUS Project. All rights reserved.</footer>
+        <footer>© 2026 AI+X NEXUS PROJECT</footer>
     </div>
 
     <script>
-      // URL의 파라미터를 읽어와서 화면에 표시하는 로직
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has("name"))
-        document.getElementById("user-name").innerText = urlParams.get("name");
-      if (urlParams.has("topic"))
-        document.getElementById("topic").innerText = urlParams.get("topic");
-      if (urlParams.has("text"))
-        document.getElementById("ai-response").innerText = decodeURIComponent(
-          urlParams.get("text"),
-        );
+        // ✨ 배경 별 생성 스크립트
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 3;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            starsContainer.appendChild(star);
+        }
 
-      // 날짜 자동 설정
-      document.getElementById("current-date").innerText =
-        new Date().toLocaleDateString();
+        // 🔮 데이터 로드 스크립트
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('name')) document.getElementById('user-name').innerText = urlParams.get('name');
+        if(urlParams.has('topic')) document.getElementById('topic').innerText = urlParams.get('topic');
+        if(urlParams.has('text')) {
+            // 줄바꿈 문자(\n)를 HTML 태그(<br>)로 변환하여 출력
+            const cleanText = decodeURIComponent(urlParams.get('text')).replace(/\\n/g, '<br>');
+            document.getElementById('ai-response').innerHTML = cleanText;
+        }
+        
+        // 카드 이미지 경로 처리 (card_id 파라미터가 있을 경우)
+        if(urlParams.has('card')) {
+            const cardId = urlParams.get('card').padStart(2, '0');
+            // GitHub에 업로드한 이미지 경로와 맞춤
+            document.getElementById('card-image').src = `./images/tarot_cards/${cardId}.png`;
+        }
+
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('ko-KR', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
     </script>
-  </body>
+</body>
 </html>
