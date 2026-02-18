@@ -169,29 +169,45 @@
 
         // ✨ 이미지 저장 함수
         function saveResult() {
-            const btn = document.querySelector('.save-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "⏳ 저장 중...";
+    const btn = document.querySelector('.save-btn');
+    const originalText = btn.innerText;
+    btn.innerText = "⏳ 저장 중...";
+    
+    const area = document.getElementById('capture-area');
+    
+    html2canvas(area, {
+        // 1. 배경색을 약간 밝은 회색(#1a1a1a)으로 설정하여 가독성 확보
+        backgroundColor: "#1a1a1a", 
+        scale: 2, 
+        useCORS: true, 
+        logging: false,
+        // 2. 캡처할 때만 스타일을 강제로 보정하는 옵션 추가
+        onclone: (clonedDoc) => {
+            const clonedArea = clonedDoc.getElementById('capture-area');
+            // 캡처본에서는 투명도를 없애고 배경을 확실하게 칠함
+            clonedArea.style.opacity = "1";
+            clonedArea.style.background = "#1a1a1a"; 
+            clonedArea.style.transform = "none";
             
-            const area = document.getElementById('capture-area');
-            
-            html2canvas(area, {
-                backgroundColor: "#050508", // 저장될 이미지 배경색
-                scale: 2, // 고화질 설정
-                useCORS: true, // 이미지 서버 허용
-                logging: false
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Nexus_Tarot_Result.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                btn.innerText = originalText;
-            }).catch(err => {
-                console.error("저장 실패:", err);
-                btn.innerText = "❌ 저장 실패";
-                setTimeout(() => btn.innerText = originalText, 2000);
-            });
+            // 텍스트 색상이 너무 흐릿하다면 강제로 밝게 만듦
+            const resultBox = clonedArea.querySelector('.result-box');
+            if (resultBox) {
+                resultBox.style.background = "#252525";
+                resultBox.style.color = "#e0e0e0";
+            }
         }
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Nexus_Tarot_Result.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        btn.innerText = originalText;
+    }).catch(err => {
+        console.error("저장 실패:", err);
+        btn.innerText = "❌ 저장 실패";
+        setTimeout(() => btn.innerText = originalText, 2000);
+    });
+}
     </script>
 </body>
 </html>
