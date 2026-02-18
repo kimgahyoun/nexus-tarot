@@ -174,33 +174,44 @@
             btn.innerText = "⏳ 저장 중...";
             
             html2canvas(area, {
-                backgroundColor: "#1a1a1a",
+                backgroundColor: "#1a1a1a", // 배경을 확실하게 지정
                 scale: 2,
                 useCORS: true,
-                logging: false
+                logging: false,
+                // ✨ 이 onclone 부분이 있어야 이미지가 밝게 나옵니다!
+                onclone: (clonedDoc) => {
+                    const clonedArea = clonedDoc.getElementById('capture-area');
+                    clonedArea.style.opacity = "1";
+                    clonedArea.style.transform = "none";
+                    clonedArea.style.background = "#1a1a1a"; // 캡처본 배경 강제 고정
+                    
+                    const resultBox = clonedArea.querySelector('.result-box');
+                    if (resultBox) {
+                        resultBox.style.background = "#252525";
+                        resultBox.style.color = "#e0e0e0";
+                    }
+                }
             }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 
-                // [수정된 부분] 모바일 크롬/사파리 모두에서 100% 작동하는 방식
-                // 1. 현재 화면 위에 꽉 차는 레이어를 만듭니다.
+                // 레이어 팝업으로 띄워주기 (모바일/PC 공통으로 가장 확실함)
                 const overlay = document.createElement('div');
-                overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; animation:fadeIn 0.3s;";
+                overlay.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;";
                 
                 overlay.innerHTML = `
-                    <p style="color:#d4af37; margin-bottom:15px; font-weight:bold;">👇 이미지를 꾹 눌러 '사진 저장' 하세요!</p>
-                    <img src="${imgData}" style="width:85%; max-width:400px; border:2px solid #d4af37; border-radius:10px;">
-                    <button id="close-overlay" style="margin-top:20px; padding:12px 30px; background:#444; color:white; border:none; border-radius:25px; cursor:pointer;">창 닫기</button>
+                    <p style="color:#d4af37; margin-bottom:15px; font-weight:bold; text-align:center;">👇 이미지를 꾹 눌러 '사진 저장' 하세요!<br><span style="font-size:12px; font-weight:normal; color:#aaa;">(PC는 자동으로 다운로드됩니다)</span></p>
+                    <img src="${imgData}" style="width:100%; max-width:400px; border:2px solid #d4af37; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.5);">
+                    <button id="close-overlay" style="margin-top:20px; padding:12px 40px; background:#d4af37; color:black; border:none; border-radius:25px; font-weight:bold; cursor:pointer;">창 닫기</button>
                 `;
                 
                 document.body.appendChild(overlay);
                 
-                // 창 닫기 버튼 이벤트
                 document.getElementById('close-overlay').onclick = () => {
                     document.body.removeChild(overlay);
                     btn.innerText = originalText;
                 };
         
-                // PC 사용자를 위해 다운로드도 동시에 시도
+                // PC용 자동 다운로드 시도
                 const link = document.createElement('a');
                 link.href = imgData;
                 link.download = `Nexus_Tarot_Result.png`;
@@ -210,7 +221,7 @@
             }).catch(err => {
                 console.error("저장 실패:", err);
                 btn.innerText = "❌ 재시도";
-                setTimeout(() => { btn.innerText = originalText; }, 2000);
+                setTimeout(() => btn.innerText = originalText, 2000);
             });
         }
     </script>
