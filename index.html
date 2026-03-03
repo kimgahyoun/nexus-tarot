@@ -116,14 +116,15 @@
         <div class="date" id="current-date">DATE</div>
         
         <div id="user-info" style="margin-bottom: 20px;">
-            <span class="highlight" id="user-name">내담자</span>님의 상담 결과
+            <span class="highlight" id="user-name">내담자</span>님의 미래 카드
         </div>
 
         <img id="card-image" src="https://via.placeholder.com/300x500?text=Tarot+Card" alt="타로 카드" class="tarot-img">
         
         <div class="result-box">
-            <p><strong>주제:</strong> <span id="topic">연애운</span></p>
-            <p id="ai-response" style="font-size: 0.95rem;">AI 마스터가 당신의 미래를 해석하고 있습니다...</p>
+            <p><strong>위치:</strong> <span id="position">정위치</span></p>
+            <p><strong>카드:</strong> <span id="card-name" class="highlight"></span></p>
+            <div id="ai-response" style="font-size: 0.95rem; line-height: 1.7;"></div>
         </div>
 
         <footer>© 2026 AI+X NEXUS PROJECT</footer>
@@ -158,24 +159,65 @@
             starsContainer.appendChild(star);
         }
 
-        // 2. 데이터 로드 로직
-        const urlParams = new URLSearchParams(window.location.search);
-        if(urlParams.has('name')) document.getElementById('user-name').innerText = urlParams.get('name');
-        if(urlParams.has('topic')) document.getElementById('topic').innerText = urlParams.get('topic');
-        if(urlParams.has('text')) {
-            const cleanText = decodeURIComponent(urlParams.get('text')).replace(/\\n/g, '<br>');
-            document.getElementById('ai-response').innerHTML = cleanText;
-        }
-        if(urlParams.has('card')) {
-            const cardId = urlParams.get('card'); 
-            document.getElementById('card-image').src = `./images/tarot_cards/Card_${cardId}.jpg`;
+        // 2. 🔥 QR 파라미터에서 데이터 로드 (핵심 변경!)
+        async function loadCardData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // QR에서 card 번호와 방향 추출
+            const cardNum = parseInt(urlParams.get('card'));
+            const direction = urlParams.get('dir') || 'upright';
+            
+            if (!cardNum || isNaN(cardNum)) {
+                document.getElementById('ai-response').innerHTML = 
+                    '❌ 유효하지 않은 카드 번호입니다. QR 코드를 다시 스캔해주세요.';
+                return;
+            }
+
+            try {
+                // QR_data.json에서 카드 데이터 가져오기
+                const response = await fetch('./data/QR_data.json');
+                const data = await response.json();
+                const card = data.cards.find(c => c.number === cardNum);
+                
+                if (!card) {
+                    document.getElementById('ai-response').innerHTML = 
+                        '❌ 해당 카드를 찾을 수 없습니다.';
+                    return;
+                }
+
+                // 데이터 표시
+                document.getElementById('card-name').textContent = card.name;
+                document.getElementById('position').textContent = 
+                    direction === 'upright' ? '정위치' : '역위치';
+                document.getElementById('card-image').src = 
+                    `./images/tarot_cards/Card_${cardNum}.jpg`;
+                document.getElementById('ai-response').innerHTML = 
+                    card[direction === 'upright' ? 'upright_advice' : 'reversed_advice']
+                    .replace(/\n/g, '<br>');
+
+                // 사용자 이름 (선택사항)
+                if(urlParams.has('name')) {
+                    document.getElementById('user-name').textContent = 
+                        decodeURIComponent(urlParams.get('name'));
+                }
+
+            } catch (error) {
+                console.error('데이터 로드 실패:', error);
+                document.getElementById('ai-response').innerHTML = 
+                    '❌ 데이터를 불러오는 중 오류가 발생했습니다.<br>서버 상태를 확인해주세요.';
+            }
         }
 
-        document.getElementById('current-date').innerText = new Date().toLocaleDateString('ko-KR', {
-            year: 'numeric', month: 'long', day: 'numeric'
-        });
+        // 3. 현재 날짜 표시 (기존)
+        document.getElementById('current-date').innerText = 
+            new Date().toLocaleDateString('ko-KR', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
 
-        // 3. 이미지 저장 함수 (구조 정밀 보정)
+        // 4. 페이지 로드 시 데이터 로드 실행
+        window.addEventListener('load', loadCardData);
+
+        // 5. 이미지 저장 함수 (구조 정밀 보정)
         function saveResult() {
             const btn = document.querySelector('.save-btn');
             const originalText = btn.innerText;
