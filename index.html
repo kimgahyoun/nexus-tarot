@@ -122,8 +122,8 @@
         <img id="card-image" src="https://via.placeholder.com/300x500?text=Tarot+Card" alt="타로 카드" class="tarot-img">
         
         <div class="result-box">
-            <p><strong>위치:</strong> <span id="position">정위치</span></p>
             <p><strong>카드:</strong> <span id="card-name" class="highlight"></span></p>
+            <p><strong>방향:</strong> <span id="position">정방향</span></p>
             <div id="ai-response" style="font-size: 0.95rem; line-height: 1.7;"></div>
         </div>
 
@@ -188,7 +188,7 @@
                 // 데이터 표시
                 document.getElementById('card-name').textContent = card.name;
                 document.getElementById('position').textContent = 
-                    direction === 'upright' ? '정위치' : '역위치';
+                    direction === 'upright' ? '정방향' : '역방향';
                 document.getElementById('card-image').src = 
                     `./images/tarot_cards/Card_${cardNum}.jpg`;
                 document.getElementById('ai-response').innerHTML = 
